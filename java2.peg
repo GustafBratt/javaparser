@@ -1,0 +1,8 @@
+identifier = r'[A-Za-z]+'
+interface_list = identifier (r',' identifier)*
+return_type = identifier
+visibility = r'public' / r'private' / r'protected'
+classname = identifier
+parent = identifier
+class = (visibility)? r'class' classname (r'extends' parent)? (r'implements' interface_list)* r'{' r'}'
+java = class EOF

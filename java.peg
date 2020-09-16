@@ -1,0 +1,9 @@
+arg_list = (identifier identifier) (r',' identifier identifier)+ / (identifier identifier)
+method = identifier identifier r'\(' (arg_list)? r'\)' r'{' r'}'
+class_body = (method)*
+identifier = r'[A-Za-z]+'
+interface_list = ('implements' identifier (r',' identifier)*)
+class = r'class ' r'[A-Za-z]+' interface_list? r'{' class_body r'}'
+classname = identifier
+child_class = r'class ' classname r'extends' identifier interface_list? r'{' class_body r'}'
+java = class EOF / child_class EOF
