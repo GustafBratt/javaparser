@@ -1,8 +1,12 @@
 identifier = r'[A-Za-z]+'
+typename = identifier
+visibility = r'public' / r'private' / r'protected'
+
+argument_list = (typename identifier) (r',' typename identifier)+
+method = (visibility)? typename identifier r'\(' (argument_list)* r'\)' r'{' r'}'
+class_body = (method)+
 interface_list = identifier (r',' identifier)*
 return_type = identifier
-visibility = r'public' / r'private' / r'protected'
-classname = identifier
 parent = identifier
-class = (visibility)? r'class' classname (r'extends' parent)? (r'implements' interface_list)* r'{' r'}'
+class = (visibility)? r'class' typename (r'extends' parent)? (r'implements' interface_list)* r'{' (class_body)* r'}'
 java = class EOF

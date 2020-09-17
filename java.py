@@ -10,7 +10,7 @@ class JavaClass:
         else:
             self.parent = parent
         self.interface_list = interface_list
-        self.methods = None
+        self.methods = [[]]
         self._visibility = "package-private"
 
     def set_visibility(self, vis):
@@ -22,10 +22,12 @@ class JavaClass:
             iflist = f"implements {', '.join(self.interface_list)}"
         else:
             iflist = ""
-        return f"{self._visibility} class {self.name} extends {self.parent} {iflist} {{ }}"
+        return f"{self._visibility} class {self.name} extends {self.parent} {iflist} {{ {[str(m) for m in self.methods]} }}"
 
     def set_methods(self, methods):
-        self.methods = methods
+        if methods == None:
+            methods = [[]]
+        self.methods = methods[0]
 
 
 class JavaMethod:
@@ -45,14 +47,26 @@ class CalcVisitor(PTNodeVisitor):
     def visit_class(self, node, children):
         parent = children.results.get("parent", [None])[0]
         iflist = children.results.get("interface_list", [None])[0]
-        jc = JavaClass(children.results["classname"][0], parent, iflist)
+        jc = JavaClass(children.results["typename"][0], parent, iflist)
         visibility = children.results.get('visibility', [None])[0]
         jc.set_visibility(visibility)
+        jc.set_methods(children.results.get("class_body"))
         return jc
 
     def visit_interface_list(self, node, children):
         return children.results['identifier']
 
+    def visit_method(self, node, children):
+        jm = JavaMethod(children.results["identifier"], [])
+        jm.return_type = children.results["typename"]
+        jm.arg_list = children.results.get("argument_list", [None])[0]
+        return jm;
+
+    def visit_argument_list(self, node, children):
+        return children.results["typename"]
+
+    def visit_class_body(self, node, children):
+        return children.results.get("method", None)
 
 def main():
     with open('java2.peg', 'r') as file:
@@ -79,9 +93,10 @@ def main():
 #        "class Foo implements {}",
 #    ]
     ok_samples = [
-        "sampleinputs/SampleA.java",
+        "sampleinputs/SampleD.java",
         "sampleinputs/SampleB.java",
         "sampleinputs/SampleC.java",
+        "sampleinputs/SampleA.java",
 
     ]
     for input_file in ok_samples:

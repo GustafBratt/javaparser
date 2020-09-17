@@ -1,1 +1,4 @@
-protected class Knas {}
+protected class Knas {
+    void hejhopp() {
+    }
+}
